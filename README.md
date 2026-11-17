@@ -26,7 +26,7 @@ It also includes features such as charger availability management, validation of
 | Member | Name | Registration Number | Role | Contribution |
 |---|---|---|---|---|
 | Member 1 | K Umesh | 252U1R6105 | Server Setup & Integration | Express server setup, SQLite connection, server initialization, integration of all modules, and resolving integration errors. |
-| Member 2 | Diviti Bharadwaj | 252U1R6060 | Commuter Management | Commuter CRUD operations, input validation, invalid ID handling, and duplicate email validation. |
+| Member 2 | Diviti Bharadwaj | 252U1R6060 | Commuter Management | Commuter CRUD operations, input validation, and invalid ID handling. |
 | Member 3 | Gudivari Reddy Chathurya | 252U1R6087 | Charger Management | Charger CRUD operations, Top 3 Most-Rented Chargers, and alphabetical sorting for tied rental counts. |
 | Member 4 | Kadiyala Sama Kruthika | 252U1R6107 | Rental Management | Rental CRUD operations, ID verification, charger availability management, and SQL JOIN operations. |
 | Member 5 | Gurram Shravana Manikanta | 252U1R6094 | Database, Documentation & Testing | Database maintenance, schema and relationship verification, sample records, Postman testing, README documentation, and screenshots. |
@@ -114,6 +114,10 @@ Base URL: `http://localhost:3000`
 | PUT | `/chargers/:chargerId/` | Update charger details |
 | DELETE | `/chargers/:chargerId/` | Delete a charger |
 | GET | `/chargers/top/` | Get the Top 3 Most-Rented Chargers |
+| GET | `/chargers/?type=DC` | Search chargers by type |
+| GET | `/chargers/?order=DESC&order_by=price_per_hour` | Sort chargers by price in descending order |
+
+The charger listing endpoint supports filtering by charger type and sorting by supported columns in ascending or descending order using the `order` and `order_by` query parameters.
 
 ### 3. Rental Management
 
@@ -124,6 +128,19 @@ Base URL: `http://localhost:3000`
 | POST | `/rentals/` | Create a new rental |
 | PUT | `/rentals/:rentalId/` | Update rental details and status |
 | DELETE | `/rentals/:rentalId/` | Delete a rental |
+
+## HTTP Status Codes
+
+The application uses appropriate HTTP status codes to indicate the result of API operations.
+
+| Status Code | Description |
+|---|---|
+| 200 | Request successful |
+| 201 | Resource created successfully |
+| 400 | Invalid input or missing required fields |
+| 404 | Requested commuter, charger, or rental not found |
+| 409 | Resource conflict, such as an unavailable charger |
+| 500 | Internal server error |
 
 ## Important Features
 
@@ -136,6 +153,7 @@ The application supports creating, retrieving, updating, and deleting commuters,
 - Only available chargers can be rented.
 - Charger status is updated when a rental is created.
 - Chargers are made available when rentals are completed or cancelled.
+- Unavailable chargers cannot be rented again through the normal rental creation flow.
 
 ### 3. ID Validation
 
@@ -153,63 +171,117 @@ The application identifies the three chargers with the highest number of rentals
 - Chargers with equal rental counts are sorted alphabetically.
 - Chargers with zero rentals are excluded.
 
+### 6. Input Validation
+
+The application performs input validation to ensure that valid data is entered through API requests.
+
+- **Commuter Validation:** Checks required commuter name and email fields, validates the email format, and checks the phone field type when provided.
+- **Charger Validation:** Checks charger name, location, charger type, positive power output, non-negative price per hour, and valid charger status.
+- **Rental Validation:** Checks required commuter ID, charger ID, valid start time, permitted rental status, valid end time, and non-negative total amount.
+
+Invalid input requests return appropriate HTTP 400 responses.
+
+### 7. Charger Search and Sorting
+
+- Chargers can be searched using their charger type.
+- Results can be sorted using supported charger columns.
+- Sorting supports ascending (ASC) and descending (DESC) order.
+- Allowed sorting columns and directions are validated before executing the SQL query.
+
+## Postman Testing
+
+The REST API endpoints are tested using Postman.
+
+The collection includes requests for:
+
+- Commuter CRUD operations
+- Charger CRUD operations
+- Charger search and sorting
+- Top 3 Most-Rented Chargers
+- Rental CRUD operations
+- Input validation and error handling
+- Invalid IDs and missing records
+- Charger availability conflicts
+
 ## Screenshots
 
 Postman screenshots demonstrating API operations, responses, and validation are stored in the `screenshots/` folder.
 
-### Commuter Management
+**### Commuter Management**
 
-#### GET All Commuters
+**#### GET All Commuters**
+
 ![GET All Commuters](screenshots/get-all-commuters.png)
 
-#### GET 1 Commuter
+**#### GET 1 Commuter**
+
 ![GET 1 Commuter By ID](screenshots/get-commuter-by-Id.png)
 
-#### POST Commuter
+**#### POST Commuter**
+
 ![POST Commuter](screenshots/post-commuter.png)
 
-#### PUT Commuter
+**#### PUT Commuter**
+
 ![PUT Commuter](screenshots/put-commuter.png)
 
-#### DELETE Commuter
+**#### DELETE Commuter**
+
 ![DELETE Commuter](screenshots/delete-commuter.png)
 
-### Charger Management
+**### Charger Management**
 
-#### GET All Chargers
+**#### GET All Chargers**
+
 ![GET All Chargers](screenshots/get-all-chargers.png)
 
-#### GET 1 Chargers
+**#### GET 1 Chargers**
+
 ![GET 1 Charger By ID](screenshots/get-charger-by-Id.png)
 
-#### POST Charger
+**#### POST Charger**
+
 ![POST Charger](screenshots/post-charger.png)
 
-#### PUT Charger
+**#### PUT Charger**
+
 ![PUT Charger](screenshots/put-charger.png)
 
-#### DELETE Charger
+**#### DELETE Charger**
+
 ![DELETE Charger](screenshots/delete-charger.png)
 
-#### Top 3 Most-Rented Chargers
+**#### Top 3 Most-Rented Chargers**
+
 ![Top 3 Most-Rented Chargers](screenshots/top-3-chargers.png)
 
-### Rental Management
+**### Rental Management**
 
-#### GET All Rentals
+**#### GET All Rentals**
+
 ![GET All Rentals](screenshots/get-all-rentals.png)
 
-#### GET 1 Rental
+**#### GET 1 Rental**
+
 ![GET 1 Rental By ID](screenshots/get-rental-by-Id.png)
 
-#### POST Rental
+**#### POST Rental**
+
 ![POST Rental](screenshots/post-rental.png)
 
-#### PUT Rental
+**#### PUT Rental**
+
 ![PUT Rental](screenshots/put-rental.png)
 
-#### DELETE Rental
+**#### DELETE Rental**
+
 ![DELETE Rental](screenshots/delete-rental.png)
+
+**#### Charger Search and Sorting**
+
+![Search chargers by type:](screenshots/charger-Search-chargers-by-type.png)
+![Sort chargers by price in descending order](screenshots/sort-chargers-by-price-in-descending-order.png)
+![Search and sort together](screenshots/search-and-sort-together.png)
 
 ## Notes: Problems Faced and Solutions
 
@@ -221,6 +293,8 @@ Postman screenshots demonstrating API operations, responses, and validation are 
 6. **Top 3 Most-Rented Chargers:** Used SQL aggregation, GROUP BY, COUNT, HAVING, and ORDER BY to identify the most-rented chargers.
 7. **SQL Query Parameters:** Used parameterized SQL queries to safely pass values into database operations.
 8. **Deployment Port Configuration:** Used `process.env.PORT || 3000` to support deployment platforms such as Render.
+9. **Input Validation:** Added validation checks to prevent invalid or incomplete data from being inserted or updated.
+10. **Charger Search and Sorting:** Implemented query parameters to filter chargers by type and sort results using supported columns and sorting directions.
 
 ## Technologies Used
 
@@ -231,16 +305,6 @@ Postman screenshots demonstrating API operations, responses, and validation are 
 - Postman
 - Git and GitHub
 - Render
-
-## Team Responsibilities
-
-| Member | Responsibility |
-|---|---|
-| Member 1 | Server Setup & Integration |
-| Member 2 | Commuter Management |
-| Member 3 | Charger Management |
-| Member 4 | Rental Management |
-| Member 5 | Database, Documentation & Testing |
 
 ## Conclusion
 
