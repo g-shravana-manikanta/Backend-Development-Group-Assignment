@@ -47,8 +47,40 @@ app.get('/commuters/', async (request, response) => {
 app.post('/commuters/', async (request, response) => {
   try {
     const {commuterName, email, phone} = request.body
+
+    // Validation
     if (!commuterName || !email) {
-      response.status(400).send({message: 'commuterName and email are required'})
+      response.status(400).send({
+        message: 'commuterName and email are required'
+      })
+      return
+    }
+
+    if (typeof commuterName !== 'string' || commuterName.trim() === '') {
+      response.status(400).send({
+        message: 'commuterName must be a valid non-empty string'
+      })
+      return
+    }
+
+    if (
+      typeof email !== 'string' ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      response.status(400).send({
+        message: 'Provide a valid email address'
+      })
+      return
+    }
+
+    if (
+      phone !== undefined &&
+      phone !== null &&
+      typeof phone !== 'string'
+    ) {
+      response.status(400).send({
+        message: 'Phone must be a string'
+      })
       return
     }
 
@@ -92,8 +124,40 @@ app.put('/commuters/:commuterId/', async (request, response) => {
   try {
     const {commuterId} = request.params
     const {commuterName, email, phone} = request.body
+
+    // Validation
     if (!commuterName || !email) {
-      response.status(400).send({message: 'commuterName and email are required'})
+      response.status(400).send({
+        message: 'commuterName and email are required'
+      })
+      return
+    }
+
+    if (typeof commuterName !== 'string' || commuterName.trim() === '') {
+      response.status(400).send({
+        message: 'commuterName must be a valid non-empty string'
+      })
+      return
+    }
+
+    if (
+      typeof email !== 'string' ||
+      !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+    ) {
+      response.status(400).send({
+        message: 'Provide a valid email address'
+      })
+      return
+    }
+
+    if (
+      phone !== undefined &&
+      phone !== null &&
+      typeof phone !== 'string'
+    ) {
+      response.status(400).send({
+        message: 'Phone must be a string'
+      })
       return
     }
 
@@ -133,6 +197,7 @@ app.delete('/commuters/:commuterId/', async (request, response) => {
     })
   }
 })
+
 
 
 // ---------------- CHARGERS CRUD ----------------
