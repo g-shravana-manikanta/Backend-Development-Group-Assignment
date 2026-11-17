@@ -138,15 +138,12 @@ app.delete('/commuters/:commuterId/', async (request, response) => {
 
 app.get('/chargers/', async (request, response) => {
   try {
+    const {type = ''} = request.query
     const getChargersQuery = `
-      SELECT charger_id AS chargerId,
-             charger_name AS chargerName, location,
-             charger_type AS chargerType,
-             power_output AS powerOutput,
-             price_per_hour AS pricePerHour, status
-      FROM chargers
-      ORDER BY charger_id;
-    `
+    SELECT *
+    FROM chargers
+    WHERE charger_type LIKE '%${type}%'
+    ORDER BY charger_id ASC;`
     const chargersArray = await db.all(getChargersQuery)
     response.send(chargersArray)
   } catch (error) {
