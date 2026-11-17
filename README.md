@@ -9,7 +9,7 @@
 
 ## Live Link
 
-- **Live API URL:** https://backend-development-group-assignment.onrender.com
+- **Live API URL:** [https://backend-development-group-assignment.onrender.com](https://backend-development-group-assignment.onrender.com)
 
 ## Project Description
 
@@ -171,17 +171,7 @@ The application identifies the three chargers with the highest number of rentals
 - Chargers with equal rental counts are sorted alphabetically.
 - Chargers with zero rentals are excluded.
 
-### 6. Input Validation
-
-The application performs input validation to ensure that valid data is entered through API requests.
-
-- **Commuter Validation:** Checks required commuter name and email fields, validates the email format, and checks the phone field type when provided.
-- **Charger Validation:** Checks charger name, location, charger type, positive power output, non-negative price per hour, and valid charger status.
-- **Rental Validation:** Checks required commuter ID, charger ID, valid start time, permitted rental status, valid end time, and non-negative total amount.
-
-Invalid input requests return appropriate HTTP 400 responses.
-
-### 7. Charger Search and Sorting
+### 6. Charger Search and Sorting
 
 - Chargers can be searched using their charger type.
 - Results can be sorted using supported charger columns.
@@ -199,89 +189,96 @@ The collection includes requests for:
 - Charger search and sorting
 - Top 3 Most-Rented Chargers
 - Rental CRUD operations
-- Input validation and error handling
 - Invalid IDs and missing records
 - Charger availability conflicts
 
 ## Screenshots
 
-Postman screenshots demonstrating API operations, responses, and validation are stored in the `screenshots/` folder.
+Postman screenshots demonstrating API operations and responses are stored in the `screenshots/` folder.
 
-**### Commuter Management**
+### Commuter Management
 
-**#### GET All Commuters**
+#### GET All Commuters
 
 ![GET All Commuters](screenshots/get-all-commuters.png)
 
-**#### GET 1 Commuter**
+#### GET 1 Commuter
 
 ![GET 1 Commuter By ID](screenshots/get-commuter-by-Id.png)
 
-**#### POST Commuter**
+#### POST Commuter
 
 ![POST Commuter](screenshots/post-commuter.png)
 
-**#### PUT Commuter**
+#### PUT Commuter
 
 ![PUT Commuter](screenshots/put-commuter.png)
 
-**#### DELETE Commuter**
+#### DELETE Commuter
 
 ![DELETE Commuter](screenshots/delete-commuter.png)
 
-**### Charger Management**
+### Charger Management
 
-**#### GET All Chargers**
+#### GET All Chargers
 
 ![GET All Chargers](screenshots/get-all-chargers.png)
 
-**#### GET 1 Chargers**
+#### GET 1 Charger
 
 ![GET 1 Charger By ID](screenshots/get-charger-by-Id.png)
 
-**#### POST Charger**
+#### POST Charger
 
 ![POST Charger](screenshots/post-charger.png)
 
-**#### PUT Charger**
+#### PUT Charger
 
 ![PUT Charger](screenshots/put-charger.png)
 
-**#### DELETE Charger**
+#### DELETE Charger
 
 ![DELETE Charger](screenshots/delete-charger.png)
 
-**#### Top 3 Most-Rented Chargers**
+#### Top 3 Most-Rented Chargers
 
 ![Top 3 Most-Rented Chargers](screenshots/top-3-chargers.png)
 
-**### Rental Management**
+#### Charger Search and Sorting
 
-**#### GET All Rentals**
+**Search Chargers by Type**
+
+![Search chargers by type](screenshots/charger-Search-chargers-by-type.png)
+
+**Sort Chargers by Price in Descending Order**
+
+![Sort chargers by price in descending order](screenshots/sort-chargers-by-price-in-descending-order.png)
+
+**Search and Sort Together**
+
+![Search and sort together](screenshots/search-and-sort-together.png)
+
+### Rental Management
+
+#### GET All Rentals
 
 ![GET All Rentals](screenshots/get-all-rentals.png)
 
-**#### GET 1 Rental**
+#### GET 1 Rental
 
 ![GET 1 Rental By ID](screenshots/get-rental-by-Id.png)
 
-**#### POST Rental**
+#### POST Rental
 
 ![POST Rental](screenshots/post-rental.png)
 
-**#### PUT Rental**
+#### PUT Rental
 
 ![PUT Rental](screenshots/put-rental.png)
 
-**#### DELETE Rental**
+#### DELETE Rental
 
 ![DELETE Rental](screenshots/delete-rental.png)
-
-**#### Charger Search and Sorting**
-
-![Search chargers by type:](screenshots/charger-Search-chargers-by-type.png)
-![Sort chargers by price in descending order](screenshots/sort-chargers-by-price-in-descending-order.png)
-![Search and sort together](screenshots/search-and-sort-together.png)
 
 ## Notes: Problems Faced and Solutions
 
@@ -293,8 +290,7 @@ Postman screenshots demonstrating API operations, responses, and validation are 
 6. **Top 3 Most-Rented Chargers:** Used SQL aggregation, GROUP BY, COUNT, HAVING, and ORDER BY to identify the most-rented chargers.
 7. **SQL Query Parameters:** Used parameterized SQL queries to safely pass values into database operations.
 8. **Deployment Port Configuration:** Used `process.env.PORT || 3000` to support deployment platforms such as Render.
-9. **Input Validation:** Added validation checks to prevent invalid or incomplete data from being inserted or updated.
-10. **Charger Search and Sorting:** Implemented query parameters to filter chargers by type and sort results using supported columns and sorting directions.
+9. **Charger Search and Sorting:** Implemented query parameters to filter chargers by type and sort results using supported columns and sorting directions.
 
 ## Technologies Used
 
