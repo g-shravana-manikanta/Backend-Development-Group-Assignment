@@ -134,14 +134,15 @@ app.delete('/commuters/:commuterId/', async (request, response) => {
   }
 })
 
+
 // ---------------- CHARGERS CRUD ----------------
 
 app.get('/chargers/', async (request, response) => {
   try {
-    const {type = '',order = 'ASC',order_by = 'charger_id'} = request.query
+    const {type = '', order = 'ASC', order_by = 'charger_id'} = request.query
 
     // Allow only valid columns and sorting directions
-    const allowedColumns = ['charger_id','charger_name','location','charger_type','power_output','price_per_hour','status']
+    const allowedColumns = ['charger_id', 'charger_name', 'location', 'charger_type', 'power_output', 'price_per_hour', 'status']
     const sortOrder = order.toUpperCase()
     if (!allowedColumns.includes(order_by) ||
         !['ASC', 'DESC'].includes(sortOrder)) {
@@ -171,10 +172,38 @@ app.post('/chargers/', async (request, response) => {
   try {
     const {chargerName, location, chargerType, powerOutput, pricePerHour, status} = request.body
 
+    // Validation
     if (!chargerName || !location || !chargerType ||
-        !Number.isFinite(Number(powerOutput)) || Number(powerOutput) <= 0 ||
-        !Number.isFinite(Number(pricePerHour)) || Number(pricePerHour) < 0) {
-      response.status(400).send({message: 'Provide valid charger details'})
+        powerOutput === undefined || powerOutput === null || powerOutput === '' ||
+        pricePerHour === undefined || pricePerHour === null || pricePerHour === '') {
+      response.status(400).send({
+        message: 'All charger details are required'
+      })
+      return
+    }
+
+    if (
+      typeof chargerName !== 'string' || chargerName.trim() === '' ||
+      typeof location !== 'string' || location.trim() === '' ||
+      typeof chargerType !== 'string' || chargerType.trim() === ''
+    ) {
+      response.status(400).send({
+        message: 'Charger name, location and type must be valid strings'
+      })
+      return
+    }
+
+    if (!Number.isFinite(Number(powerOutput)) || Number(powerOutput) <= 0) {
+      response.status(400).send({
+        message: 'powerOutput must be a positive number'
+      })
+      return
+    }
+
+    if (!Number.isFinite(Number(pricePerHour)) || Number(pricePerHour) < 0) {
+      response.status(400).send({
+        message: 'pricePerHour must be a non-negative number'
+      })
       return
     }
 
@@ -254,11 +283,46 @@ app.put('/chargers/:chargerId/', async (request, response) => {
     const {chargerId} = request.params
     const {chargerName, location, chargerType, powerOutput, pricePerHour, status} = request.body
 
+    // Validation
     if (!chargerName || !location || !chargerType ||
-        !Number.isFinite(Number(powerOutput)) || Number(powerOutput) <= 0 ||
-        !Number.isFinite(Number(pricePerHour)) || Number(pricePerHour) < 0 ||
-        !['available', 'rented', 'maintenance'].includes(status)) {
-      response.status(400).send({message: 'Provide valid charger details'})
+        powerOutput === undefined || powerOutput === null || powerOutput === '' ||
+        pricePerHour === undefined || pricePerHour === null || pricePerHour === '' ||
+        !status) {
+      response.status(400).send({
+        message: 'All charger details are required'
+      })
+      return
+    }
+
+    if (
+      typeof chargerName !== 'string' || chargerName.trim() === '' ||
+      typeof location !== 'string' || location.trim() === '' ||
+      typeof chargerType !== 'string' || chargerType.trim() === ''
+    ) {
+      response.status(400).send({
+        message: 'Charger name, location and type must be valid strings'
+      })
+      return
+    }
+
+    if (!Number.isFinite(Number(powerOutput)) || Number(powerOutput) <= 0) {
+      response.status(400).send({
+        message: 'powerOutput must be a positive number'
+      })
+      return
+    }
+
+    if (!Number.isFinite(Number(pricePerHour)) || Number(pricePerHour) < 0) {
+      response.status(400).send({
+        message: 'pricePerHour must be a non-negative number'
+      })
+      return
+    }
+
+    if (!['available', 'rented', 'maintenance'].includes(status)) {
+      response.status(400).send({
+        message: 'Invalid charger status'
+      })
       return
     }
 
@@ -373,7 +437,7 @@ app.post('/rentals/', async (request, response) => {
       SELECT charger_id, status FROM chargers WHERE charger_id = ?;
     `
     const charger = await db.get(getChargerQuery, [chargerId])
-    
+
     if (!charger) {
       response.status(404).send({message: 'Charger Not Found'})
       return
