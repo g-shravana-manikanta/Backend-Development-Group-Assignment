@@ -138,13 +138,29 @@ app.delete('/commuters/:commuterId/', async (request, response) => {
 
 app.get('/chargers/', async (request, response) => {
   try {
-    const {type = ''} = request.query
+    const {type = '',order = 'ASC',order_by = 'charger_id'} = request.query
+
+    // Allow only valid columns and sorting directions
+    const allowedColumns = ['charger_id','charger_name','location','charger_type','power_output','price_per_hour','status']
+    const sortOrder = order.toUpperCase()
+    if (!allowedColumns.includes(order_by) ||
+        !['ASC', 'DESC'].includes(sortOrder)) {
+      response.status(400).send({
+        message: 'Invalid order_by or order value',
+      })
+      return
+    }
     const getChargersQuery = `
-    SELECT *
-    FROM chargers
-    WHERE charger_type LIKE '%${type}%'
-    ORDER BY charger_id ASC;`
-    const chargersArray = await db.all(getChargersQuery)
+      SELECT charger_id AS chargerId,
+             charger_name AS chargerName, 
+             location,
+             charger_type AS chargerType,
+             power_output AS powerOutput,
+             price_per_hour AS pricePerHour, status
+      FROM chargers
+      WHERE charger_type LIKE ?
+      ORDER BY ${order_by} ${sortOrder};`
+    const chargersArray = await db.all(getChargersQuery, [`%${type}%`])
     response.send(chargersArray)
   } catch (error) {
     response.status(500).send({message: 'Unable to get chargers'})
@@ -186,7 +202,7 @@ app.post('/chargers/', async (request, response) => {
   }
 })
 
-// This route is before /chargers/:chargerId/
+// This route is for Top 3 chargers based on the number of rentals.
 app.get('/chargers/top/', async (request, response) => {
   try {
     const getTopChargersQuery = `
@@ -285,6 +301,7 @@ app.delete('/chargers/:chargerId/', async (request, response) => {
   }
 })
 
+
 // ---------------- RENTALS CRUD ----------------
 
 app.get('/rentals/', async (request, response) => {
@@ -315,8 +332,31 @@ app.get('/rentals/', async (request, response) => {
 app.post('/rentals/', async (request, response) => {
   try {
     const {commuterId, chargerId, startTime} = request.body
+
+    // Validation
     if (!commuterId || !chargerId || !startTime) {
-      response.status(400).send({message: 'commuterId, chargerId and startTime are required'})
+      response.status(400).send({
+        message: 'commuterId, chargerId and startTime are required'
+      })
+      return
+    }
+
+    if (
+      !Number.isInteger(Number(commuterId)) ||
+      Number(commuterId) <= 0 ||
+      !Number.isInteger(Number(chargerId)) ||
+      Number(chargerId) <= 0
+    ) {
+      response.status(400).send({
+        message: 'commuterId and chargerId must be positive integers'
+      })
+      return
+    }
+
+    if (typeof startTime !== 'string' || isNaN(Date.parse(startTime))) {
+      response.status(400).send({
+        message: 'Provide a valid startTime'
+      })
       return
     }
 
@@ -333,6 +373,7 @@ app.post('/rentals/', async (request, response) => {
       SELECT charger_id, status FROM chargers WHERE charger_id = ?;
     `
     const charger = await db.get(getChargerQuery, [chargerId])
+    
     if (!charger) {
       response.status(404).send({message: 'Charger Not Found'})
       return
@@ -397,8 +438,41 @@ app.put('/rentals/:rentalId/', async (request, response) => {
   try {
     const {rentalId} = request.params
     const {status, endTime, totalAmount} = request.body
+
+    // Validation
     if (!['active', 'completed', 'cancelled'].includes(status)) {
-      response.status(400).send({message: 'Invalid rental status'})
+      response.status(400).send({
+        message: 'Invalid rental status'
+      })
+      return
+    }
+
+    if (
+      totalAmount !== undefined &&
+      (totalAmount === '' ||
+        !Number.isFinite(Number(totalAmount)) ||
+        Number(totalAmount) < 0)
+    ) {
+      response.status(400).send({
+        message: 'totalAmount must be a valid non-negative number'
+      })
+      return
+    }
+
+    if (
+      endTime !== undefined &&
+      (typeof endTime !== 'string' || isNaN(Date.parse(endTime)))
+    ) {
+      response.status(400).send({
+        message: 'Provide a valid endTime'
+      })
+      return
+    }
+
+    if (status === 'completed' && !endTime) {
+      response.status(400).send({
+        message: 'endTime is required when completing a rental'
+      })
       return
     }
 
